@@ -324,7 +324,7 @@ def main():
                     beams.add(neobeam.gen_beams())
                 else:
                     beams.add(Beam(bird))
-                beams.add(Beam(bird))
+    
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN and score.value > 200:
                 score.value -= 200
                 gravities.add(Gravity(400))
