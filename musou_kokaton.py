@@ -126,6 +126,7 @@ class Bomb(pg.sprite.Sprite):
         self.rect.centerx = emy.rect.centerx
         self.rect.centery = emy.rect.centery+emy.rect.height//2
         self.speed = 6
+        self.state = "active"
 
     def update(self):
         """
@@ -223,6 +224,36 @@ class Enemy(pg.sprite.Sprite):
         self.rect.move_ip(self.vx, self.vy)
 
 
+class EMP(pg.sprite.Sprite):
+    """
+    電磁パルスに関するクラス
+    """
+    def __init__(self, emys: pg.sprite.Group, bombs: pg.sprite.Group, screen: pg.Surface):
+        """
+        透明度のある黄色の矩形と敵機インスタンスの画像を生成
+        引数1 group：敵インスタンスのグループ
+        引数2 group：爆弾インスタンスのグループ
+        引数3 Surface：画面Surface
+        """
+        super().__init__()
+        self.emys = emys
+        self.bombs = bombs
+        self.screen = screen
+        self.image = pg.Surface((WIDTH, HEIGHT))  # 空のSurface
+        pg.draw.rect(self.image, (255, 255, 0), pg.Rect(0, 0, WIDTH, HEIGHT))  # 黄色の四角形
+        self.image.set_alpha(120)  # 透明度の設定
+        self.screen.blit(self.image, [0, 0])
+        for emy in self.emys:
+            emy.interval = float("inf")
+            emy.image = pg.transform.laplacian(emy.image)
+        for bomb in self.bombs:
+            bomb.speed /= 2
+            bomb.state = "inactive"
+        pg.display.update()
+        time.sleep(0.05)
+
+
+
 class Score:
     """
     打ち落とした爆弾，敵機の数をスコアとして表示するクラス
@@ -263,6 +294,9 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type == pg.KEYDOWN and event.key == pg.K_e and score.value >= 20:
+                EMP(emys, bombs, screen)
+                score.value -= 20
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -283,6 +317,8 @@ def main():
             score.value += 1  # 1点アップ
 
         for bomb in pg.sprite.spritecollide(bird, bombs, True):  # こうかとんと衝突した爆弾リスト
+            if bomb.state == "inactive":
+                continue
             bird.change_img(8, screen)  # こうかとん悲しみエフェクト
             score.update(screen)
             pg.display.update()
