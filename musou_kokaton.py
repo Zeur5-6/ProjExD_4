@@ -145,7 +145,8 @@ class Beam(pg.sprite.Sprite):
     def __init__(self, bird: Bird, angle0 : int = 0):
         """
         ビーム画像Surfaceを生成する
-        引数 bird：ビームを放つこうかとん
+        引数1 bird：ビームを放つこうかとん
+        引数2 angle0：ビームの発射方向を補正する角度（デフォルトは0）
         """
         super().__init__()
         self.vx, self.vy = bird.dire
@@ -168,11 +169,23 @@ class Beam(pg.sprite.Sprite):
             self.kill()
 
 class NeoBeam():
+    """
+    弾幕に関するクラス
+    """
     def __init__(self, bird: Bird, num: int):
+        """
+        弾幕を生成するための情報を保持する
+        引数1 bird：ビームを発射するこうかとん
+        引数2 num：生成するビームの本数
+        """
         self.bird = bird
         self.num = num
 
     def gen_beams(self):
+        """
+        -50度から+50度の範囲にビームを等間隔で生成する
+        戻り値：生成したBeamインスタンスのリスト
+        """
         step = 100 // (self.num - 1)
 
         beams = []
@@ -352,7 +365,7 @@ def main():
             if event.type == pg.QUIT:
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                if key_lst[pg.K_LSHIFT]:
+                if key_lst[pg.K_LSHIFT]: # 左Shift + スペースで弾幕を発射する
                     neobeam = NeoBeam(bird, 5)
                     beams.add(neobeam.gen_beams())
                 else:
@@ -361,7 +374,6 @@ def main():
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN and score.value > 200:
                 score.value -= 200
                 gravities.add(Gravity(400))
-                beams.add(Beam(bird))
 
             if event.type == pg.KEYDOWN and event.key == pg.K_e and score.value >= 20:
                 EMP(emys, bombs, screen)
