@@ -231,6 +231,8 @@ class EMP(pg.sprite.Sprite):
     def __init__(self, emys: pg.sprite.Group, bombs: pg.sprite.Group, screen: pg.Surface):
         """
         透明度のある黄色の矩形と敵機インスタンスの画像を生成
+        発動時に画面全体に透明度のある黄色の矩形を0.05秒表示
+        存在する敵機と爆弾を無効化する
         引数1 group：敵インスタンスのグループ
         引数2 group：爆弾インスタンスのグループ
         引数3 Surface：画面Surface
